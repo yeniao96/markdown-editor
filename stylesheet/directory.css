@@ -1,0 +1,33 @@
+.md-catalogContent>li{
+
+    width: 100%;
+    margin: 5px;
+
+}
+
+.md-catalogContent>li:hover{
+
+    background-color: #dddddd;
+
+}
+.md-catalogContent>li a{
+
+    color: cornflowerblue;
+    font-size:16px;
+
+}
+.md-catalogContent>li a:hover{
+
+    text-decoration: none;
+
+}
+.md-catalogContent>li a:visited{
+
+    text-decoration: none;
+
+}
+.selected{
+
+    background-color: #dddddd;
+
+}
