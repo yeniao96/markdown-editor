@@ -63,10 +63,19 @@ function createDiretory(contentId, directoryId) {
         }
 
         var index_mao = var_href.lastIndexOf("#");
-        var sub_href = var_href.substr(index_mao,len_href-index_mao);
-        console.log($('#' + contentId).scrollTop())
-        var scrollTop = $('#' + contentId).scrollTop() + $(sub_href).offset().top - 40 + 'px'
-        $('#' + contentId).animate({scrollTop:scrollTop},300);
+        var sub_href = var_href.substr(index_mao,len_href-index_mao)
+        if (sub_href === '#Title-H1-0' && $('#' + contentId).scrollTop() === 0) {
+        }else{
+
+            if ($('#' + contentId).scrollTop() === 0) {
+                var scrollTop = $('#' + contentId).scrollTop() + $(sub_href).offset().top - 50 + 'px';
+            }else{
+                var scrollTop = $('#' + contentId).scrollTop() + $(sub_href).offset().top - 10 + 'px';
+            }
+            $('#preview_scrollbar').animate({scrollTop:scrollTop},300);
+            $('#' + contentId).animate({scrollTop:scrollTop},300);
+
+        }
         return false;
 
     });
@@ -125,15 +134,6 @@ function insertText(value,type){
 
 }
 
-/**
- * 插入图片
- */
-function insertImage() {
-
-    var str =
-    md_editor.insert(str);
-
-}
 
 
 /**
