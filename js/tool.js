@@ -107,12 +107,17 @@ function selectedOption(id, node) {
 function saveText() {
 
     var a = document.createElement('a');
+    var text = '';
+    Array.from($('.ace_line_group')).forEach(function (t) {
+        text = text + t.innerText + '\n';
+    });
     a.setAttribute('href','data:text/html;gb2312,'+ md_editor.getValue());
     a.setAttribute('download', 'demo.md');
     a.setAttribute('target','_blank');
     a.style.display="none";
     $('#markdown-editor').append(a);
     a.click();
+    $('#markdown-editor')[0].removeChild(a);
 
 }
 
@@ -124,11 +129,23 @@ function saveText() {
 function insertText(value,type){
 
     var text =  md_editor.session.getTextRange(md_editor.getSelectionRange());
-    md_editor.insert(value.replace('?',text));
     if(type === 'code'){
 
+        if (text) {
+
+            md_editor.insert(value.replace('\n\n','\n'+ text +'\n'));
+
+        }else{
+
+            md_editor.insert(value.replace('?',text));
+
+        }
         var lineNumber = md_editor.selection.getCursor();
         md_editor.gotoLine(lineNumber);
+
+    }else{
+
+        md_editor.insert(value.replace('?',text));
 
     }
 
@@ -153,6 +170,7 @@ function fullScreen() {
 
         $('#editor-column')[0].style.width = '50%';
         $('#preview-column')[0].style.width = '50%';
+        $('#preview-column')[0].style.paddingLeft = '25px';
         $('#editor-toolbar')[0].style.width = '50%';
         md_editor.setOption("wrap", "free")
 
@@ -160,4 +178,103 @@ function fullScreen() {
 
 }
 
+/**
+ * 打开图片对话框
+ */
+function openDialog() {
+
+    $('#img-dialog')[0].classList.add('dialog-transform');
+    $('#app')[0].style.opacity = 0.5;
+
+
+}
+
+/**
+ * 关闭图片对话框
+ */
+function closeDialog(){
+
+    $('#img-dialog')[0].classList.remove('dialog-transform');
+    $('#app')[0].style.opacity = 1;
+    $('.dialog-body')[0].style.display = 'flex';
+    $('.dialog-ok')[0].style.display = 'none';
+    $('.dialog-webpath-input')[0].style.display = 'none';
+
+}
+
+/**
+ * 本地图片上传
+ */
+function localImgUpload() {
+
+    $('#file').trigger('click');
+    $('#file').change(function (e) {
+
+        if(e.target !== null){
+
+            var fileName = e.target.files[0].name;
+            var fileType = e.target.files[0].type;
+            var fr = new FileReader();
+            fr.onloadend = function (e) {
+
+                $.ajax({
+                    url: 'http://localhost:8888/uploadImg',
+                    type: 'post',
+                    data:{
+                        fileName: fileName,
+                        fileType: fileType,
+                        file: e.target.result
+                    },
+                    success:function (res) {
+
+                        var result = JSON.parse(res);
+                        if(result.result === 'success'){
+
+                            md_editor.insert('![' + result.imgName + '](' + result.imgPath + ')');
+                            $('#file').val('');
+                            $('#file').unbind();
+                            closeDialog();
+
+                        }else{
+
+                            alert('failed');
+                            $('#file').val('');
+                            $('#file').unbind();
+                            closeDialog();
+
+                        }
+
+                    }
+                })
+
+            }
+            fr.readAsDataURL(e.target.files[0]);
+
+        }
+
+    })
+
+}
+
+/**
+ * 网络图片输入
+ */
+function webImgLoad() {
+
+    $('.dialog-body')[0].style.display = 'none';
+    $('.dialog-ok')[0].style.display = 'block';
+    $('.dialog-webpath-input')[0].style.display = 'block';
+
+}
+
+/**
+ * 插入图片
+ */
+function insertImg() {
+
+    var url = $('#webPath').val();
+    md_editor.insert('![img](' + url + ')');
+    closeDialog();
+
+}
 

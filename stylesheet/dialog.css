@@ -1,0 +1,103 @@
+.img-dialog{
+
+    width: 400px;
+    height: 300px;
+    position: absolute;
+    box-shadow: 0 0 10px #cccccc;
+    top: -300px;
+    opacity: 0;
+    left: calc(50% - 200px);
+    background-color: #fff;
+    border-radius: 10px;
+    z-index: 9;
+    transition: all 0.8s ease;
+
+}
+.dialog-transform{
+
+    top: calc(50% - 200px);
+    opacity: 1;
+
+}
+.dialog-title{
+
+    width: 100px;
+    margin: 50px auto;
+
+}
+
+.dialog-body{
+
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+
+}
+
+.dialog-button{
+
+    display: inline-block;
+    width: 30%;
+    border-radius: 5px;
+    background-color: #169AD4;
+    text-align: center;
+    font-size: 14px;
+    padding: 10px;
+    color: #fff;
+    cursor: pointer;
+
+}
+
+.dialog-footer{
+
+    width: 100%;
+    margin-top: 50px;
+    display: flex;
+    justify-content: flex-end;
+
+}
+
+.dialog-webpath-input{
+
+    display: none;
+    text-align: center;
+
+}
+
+.dialog-webpath-input label{
+
+    margin-right: 10px;
+    font-size: 18px;
+
+}
+
+.webpath-input{
+
+    width: 200px;
+    font-size: 16px;
+    padding: 5px;
+    border: 1px solid #eeeeee
+
+}
+
+.dialog-cancel{
+
+    width: 15%;
+    margin-right: 40px;
+    background-color: transparent;
+    color: #1b1f23;
+    padding: 5px;
+    font-size: 14px;
+
+}
+.dialog-ok{
+
+    display: none;
+    width: 15%;
+    margin-right: 20px;
+    background-color: transparent;
+    color: #1b1f23;
+    padding: 5px;
+    font-size: 14px;
+
+}

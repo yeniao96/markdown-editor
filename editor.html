@@ -13,10 +13,11 @@
    <link rel="stylesheet" href="./stylesheet/index.css">
    <link rel="stylesheet" href="stylesheet/buttonStyle.css">
    <link rel="stylesheet" href="./stylesheet/directory.css">
+   <link rel="stylesheet" href="./stylesheet/dialog.css">
 </head>
 
 <body>
-<div class="app">
+<div id="app" class="app">
     <div id="container" class="container">
         <div id="editor-column" class="column editor-column">
             <div id="editor-toolbar" class="toolbar">
@@ -24,10 +25,10 @@
                 <div class="tool button" onclick="insertText('**?**')"><span class="iconfont icon-bold" aria-hidden="true"></span></div>
                 <div class="tool button" onclick="insertText('_?_')"><span class="iconfont icon-italic" aria-hidden="true"></span></div>
                 <div class="tool button" onclick="insertText('>')"><span class="iconfont icon-earth" aria-hidden="true"></span></div>
-                <div class="tool button" onclick="insertText('<img src=\'\'>')"><span class="iconfont icon-file-image" aria-hidden="true"></span></div>
+                <div class="tool button" onclick="openDialog()"><span class="iconfont icon-file-image" aria-hidden="true"></span></div>
                 <div class="tool button" onclick="insertText('* ')"><span class="iconfont icon-unorderedlist" aria-hidden="true"></span></div>
                 <div class="tool button" onclick="insertText('1. ')"><span class="iconfont icon-orderedlist" aria-hidden="true"></span></div>
-                <div class="tool button" onclick="insertText('`\n\n`', 'code')"><span class="iconfont icon-code" aria-hidden="true"></span></div>
+                <div class="tool button" onclick="insertText('```\n\n```', 'code')"><span class="iconfont icon-code" aria-hidden="true"></span></div>
                 <div id= "button-fontsize" class="tool button" onclick="insertText('#')"><span class="iconfont icon-font-size" aria-hidden="true"></span></div>
                 <div id= "button-fullScreen" class="tool button" onclick="fullScreen()"><span class="iconfont icon-fullscreen" aria-hidden="true"></span></div>
             </div>
@@ -39,7 +40,7 @@
                 <div class="tool"></div>
             </div>
             <div id="markdown-preview" class="markdown-body md-area"></div>
-            <div class="ace_scrollbar ace_scrollbar-v" id="preview_scrollbar" style="width: 13px; bottom: 0px;top: 40px;height: 95%"><div class="ace_scrollbar-inner" style="width: 13px; height: 3708px;"></div></div>
+            <div class="ace_scrollbar ace_scrollbar-v" id="preview_scrollbar" style="width: 13px; bottom: 0px;top: 40px;height:95%;display: none"><div class="ace_scrollbar-inner" style="width: 13px; height: 3708px;"></div></div>
         </div>
         <div id="md-catalog" class="md-catalog">
             <h3 align="center">目  录</h3>
@@ -47,6 +48,21 @@
         </div>
     </div>
 </div>
+    <div id="img-dialog" class="img-dialog">
+        <div class="dialog-title"><h2>插入图片</h2></div>
+        <div class="dialog-body">
+            <!--<div class="dialog-button" onclick="localImgUpload()">本地图片</div>-->
+            <!--<input type="file" accept="image/*" id="file" style="filter:alpha(opacity=0);opacity:0;width: 0;height: 0;"/>-->
+            <div class="dialog-button" onclick="webImgLoad()">网络图片</div>
+        </div>
+        <div class="dialog-webpath-input">
+            <label for="webPath">url:</label><input type="text" id="webPath" class="webpath-input"/>
+        </div>
+        <div class="dialog-footer">
+            <div class="dialog-button dialog-ok" onclick="insertImg()" >确认</div>
+            <div class="dialog-button dialog-cancel" onclick="closeDialog()">取消</div>
+        </div>
+    </div>
 </body>
 <script>
     var md_editor = ace.edit('markdown-editor');
@@ -55,15 +71,50 @@
     md_editor.getSession().setMode('ace/mode/markdown');
     md_editor.setOption("wrap", "free")
     md_editor.renderer.setShowPrintMargin(false);
-    $("#markdown-editor").keyup(function() {
+    $("#markdown-editor").keyup(function (){
         $("#markdown-preview").html(marked(md_editor.getValue()));
         createDiretory('markdown-preview', 'md-catalogContent');
+        if($('.ace_scrollbar-v')[0].style.display === 'none'){
+
+            $('#markdown-editor')[0].style.height = 'calc(100% - 40px)';
+            $('#markdown-editor')[0].style.marginTop = '40px';
+            $('#markdown-preview')[0].style.height = 'calc(100% - 40px)';
+            $('#markdown-preview')[0].style.marginTop = '40px';
+
+        }
+        if($('#markdown-preview')[0].scrollHeight > $('#preview-column')[0].scrollHeight){
+
+            $('#preview_scrollbar')[0].style.display = 'block';
+
+        }else{
+
+            $('#preview_scrollbar')[0].style.display = 'none';
+
+        }
     });
 
-    md_editor.getSession().selection.on('changeCursor', function(e) {
+    md_editor.getSession().selection.on('changeCursor', function() {
 
         $("#markdown-preview").html(marked(md_editor.getValue()));
         createDiretory('markdown-preview', 'md-catalogContent');
+
+        if($('.ace_scrollbar-v')[0].style.display === 'none'){
+
+            $('#markdown-editor')[0].style.height = 'calc(100% - 40px)';
+            $('#markdown-editor')[0].style.marginTop = '40px';
+            $('#markdown-preview')[0].style.height = 'calc(100% - 40px)';
+            $('#markdown-preview')[0].style.marginTop = '40px';
+
+        }
+        if($('#markdown-preview')[0].scrollHeight > $('#preview-column')[0].scrollHeight){
+
+            $('#preview_scrollbar')[0].style.display = 'block';
+
+        }else{
+
+            $('#preview_scrollbar')[0].style.display = 'none';
+
+        }
 
     });
 
@@ -112,33 +163,56 @@
 
         $('#markdown-preview')[0].addEventListener('mousewheel',function (e) {
 
+            var scale = $('#markdown-preview')[0].scrollHeight/$('#preview_scrollbar')[0].scrollHeight;
             if (e.wheelDelta < 0) {
 
                 $('#markdown-preview')[0].scrollTop += 100;
-                $('#preview_scrollbar')[0].scrollTop += 100;
+                $('#preview_scrollbar')[0].scrollTop += (100/scale);
 
             } else if (e.wheelDelta > 0) {
 
                 $('#markdown-preview')[0].scrollTop -= 100;
-                $('#preview_scrollbar')[0].scrollTop -= 100;
+                $('#preview_scrollbar')[0].scrollTop -= (100/scale);
             }
         })
         $('#preview_scrollbar')[0].addEventListener('mousewheel',function (e) {
 
+            var scale = $('#markdown-preview')[0].scrollHeight/$('#preview_scrollbar')[0].scrollHeight;
+
             if (e.wheelDelta < 0) {
 
-                $('#markdown-preview')[0].scrollTop += 100;
+                $('#markdown-preview')[0].scrollTop += (100*scale);
 
             } else if (e.wheelDelta > 0) {
 
-                $('#markdown-preview')[0].scrollTop -= 100;
+                $('#markdown-preview')[0].scrollTop -= (100*scale);
             }
 
         })
+
+        $('#preview_scrollbar')[0].onmousedown = function () {
+
+            $('#preview_scrollbar')[0].onmousemove = function () {
+
+                console.log(111)
+                console.log($('#preview_scrollbar')[0].scrollTop);
+
+            }
+            document.onmouseup = function () {
+
+                $('#preview_scrollbar')[0].onmousemove = null;
+                this.onmouseup = null;
+
+            }
+            console.log(222)
+
+        }
 
 
     }
     scrollChange();
 
-</script>
+
+
+    </script>
 </html>
