@@ -106,18 +106,30 @@ function selectedOption(id, node) {
  */
 function saveText() {
 
-    var a = document.createElement('a');
-    var text = '';
-    Array.from($('.ace_line_group')).forEach(function (t) {
-        text = text + t.innerText + '\n';
-    });
-    a.setAttribute('href','data:text/html;gb2312,'+ md_editor.getValue());
-    a.setAttribute('download', 'demo.md');
-    a.setAttribute('target','_blank');
-    a.style.display="none";
-    $('#markdown-editor').append(a);
-    a.click();
-    $('#markdown-editor')[0].removeChild(a);
+    /**
+     * electron 项目支持
+     */
+    if(require('electron')){
+        var { remote } = require('electron');
+        const currentFile = remote.dialog.showSaveDialog(remote.getCurrentWindow(), {
+            filters: [
+                { name: "Text Files", extensions: ['md'] },
+                { name: 'All Files', extensions: ['*'] } ]
+        });
+        var fs = require('fs');
+        fs.writeFileSync(currentFile, md_editor.getValue());
+    }else{
+
+        var a = document.createElement('a');
+        a.setAttribute('href','data:text/html;utf-8,'+ md_editor.getValue());
+        a.setAttribute('download', 'demo.md');
+        a.setAttribute('target','_blank');
+        a.style.display="none";
+        $('#markdown-editor').append(a);
+        a.click();
+        $('#markdown-editor')[0].removeChild(a);
+
+    }
 
 }
 
